@@ -51,6 +51,33 @@ Install
 Make sure you have installed all the dependencies listed above properly.
 Further instructions are available at http://neurospin.github.io/pypreclin/generated/installation.html
 
+Example: we assume that in your current working directory you have a functional
+data 'func.nii', a structural data 'anat.nii' and a template
+'mni-resampled_1by1by1.nii'. 
+::
+
+	sudo apt install fsl-5.0-complete ants virtualenv -y
+	sudo ln -s /usr/lib/ants/N4BiasFieldCorrection /usr/bin
+	wget https://www.nitrc.org/frs/download.php/7446/jip-Linux-x86_64.tar.gz
+	tar xvzf jip-Linux-x86_64.tar.gz 
+	rm jip-Linux-x86_64.tar.gz
+	virtualenv -p /usr/bin/python3.5 ./env
+	. env/bin/activate
+	pip install --no-cache-dir pypreclin
+	python env/bin/pypreclin_preproc_fmri -h
+	mkdir outputs
+	python env/bin/pypreclin_preproc_fmri \
+		-f func.nii \
+		-a anat.nii \
+		-s test \
+		-o outputs \
+		-r 2.4 \
+		-t mni-resampled_1by1by1.nii \
+		-j jip-Linux-x86_64/bin \
+		-NA RIA \
+		-NF RIA \
+		-C /etc/fsl/fsl.sh
+
 Using Singularity
 =================
 
@@ -64,5 +91,35 @@ We provide a Singularity image with pypreclin, which can be found at http://biod
 To use it install first Singularity. On Debian/Ubuntu the package is called
 singularity-container. You can check that Singularity is installed by
 typing singularity --help in a terminal.
+
+Example: we assume that in the '/volatile/pypreclin' direcctory you have a functional
+data 'func.nii', a structural data 'anat.nii' and a template
+'mni-resampled_1by1by1.nii'.
+
+Warning: no X11, you need to provide the align.com files.
+
+::
+
+	wget http://biodev.cea.fr/pypreclin/pypreclin-ubuntu.simg
+	mkdir /volatile/pypreclin/outputs
+	sudo apt install singularity-container
+	sudo nano /etc/singularity/singularity.conf
+		mount home = no 
+	singularity run --cleanenv --bind /volatile/pypreclin pypreclin-ubuntu.simg \
+	    -V 2 \
+	    -o /volatile/pypreclin/outputs \
+	    -s test \
+	    -f /volatile/pypreclin/func.nii \
+	    -a /volatile/pypreclin/anat.nii \
+	    -r 2.40 \
+	    -t /volatile/pypreclin/mni-resampled_1by1by1.nii \
+	    -NA RIA \
+	    -NF RIA \
+	    -N normalize/align.com \
+	    -M coreg/align.com \
+	    -C /etc/fsl/5.0/fsl.sh \
+	    -j /i2bm/local/jip-Linux-x86_64/bin
+
+
 
 
