@@ -1,0 +1,66 @@
+singularity shell --bind \
+    /media/DOCUMENTS/DOCUMENTS/MRI_ANALYSIS/pypreclin:/pypreclin \
+    --bind /opt/jip:/jip \
+    --bind $FSLDIR:/fsl \
+    ./singularity/pypreclin-ubuntu.simg
+
+FSLDIR=/fsl
+
+python3
+
+
+====
+
+from pypreclin.workflow.preproc_fmri import preproc
+from pprint import pprint
+import os
+
+rootdir = "/pypreclin/testdata"
+funcfile = os.path.join(rootdir, "sub-danny_ses-20191219_run-01.nii.gz")
+anatfile = os.path.join(rootdir, "sub-danny_ref_anat_res-0.5x0.5x0.5.nii.gz")
+sid = "danny"
+tr = "2.5"
+outdir = "/pypreclin/testdata/output"
+template = os.path.join(rootdir, "NMT.nii.gz")
+jipdir = "/jip/bin"
+
+--------
+
+outputs = preproc(
+        funcfile=funcfile,
+        anatfile=anatfile,
+        sid=sid,
+        outdir=outdir,
+        repetitiontime=tr,
+        template=template,
+        jipdir=jipdir,
+        erase=False,
+        resample=False,
+        interleaved=False,
+        sliceorder="ascending",
+        realign_dof=6,
+        realign_to_vol=True,
+        warp=False,
+        warp_njobs=1,
+        warp_index=8,
+        warp_file=None,
+        warp_restrict=[0, 1, 0],
+        delta_te=None,
+        dwell_time=None,
+        manufacturer=None,
+        blip_files=None,
+        blip_enc_dirs=None,
+        unwarp_direction=None,
+        phase_file=None,
+        magnitude_file=None,
+        anatorient="RAS",
+        funcorient="RAS",
+        kernel_size=3,
+        fslconfig="/etc/fsl/5.0.11/fsl.sh",
+        normalization_trf=None,
+        coregistration_trf=None,
+        recon1=False,
+        recon2=False,
+        auto=True,
+        verbose=2)
+pprint(outputs)
